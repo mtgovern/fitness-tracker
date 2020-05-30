@@ -1,41 +1,45 @@
 var db = require("../models");
 
-module.exports = function(app) {
-  app.get("/api/workouts", function(req, res) {
-    // Here we add an "include" property to our options in our findAll query
-    // We set the value to an array of the models we want to include in a left outer join
-    // In this case, just db.Post
-    // db.Author.findAll({
-    //   include: [db.Post]
-    // }).then(function(dbAuthor) {
-    //   res.json(dbAuthor);
-    // });
+module.exports = function (app) {
+  app.get("/api/workouts", function (req, res) {
+    db.Workout.find({
+    }).then(function (dbWorkout) {
+      res.json(dbWorkout);
+    });
     console.log("We should see this if it works");
   });
 
-  // app.get("/api/authors/:id", function(req, res) {
-  //   // Here we add an "include" property to our options in our findOne query
-  //   // We set the value to an array of the models we want to include in a left outer join
-  //   // In this case, just db.Post
-  //   db.Author.findOne({
-  //     where: {
-  //       id: req.params.id
-  //     },
-  //     include: [db.Post]
-  //   }).then(function(dbAuthor) {
-  //     res.json(dbAuthor);
-  //   });
-  // });
+  app.get("/api/workouts/range", function (req, res) {
+    db.Workout.find({
 
-  app.post("/api/workout", function(req, res) {
-    console.log(req);
-    db.Workout.create(req)
-    .then(dbWorkout => {
+    }).then(function (dbWorkout) {
       res.json(dbWorkout);
-    })
-    .catch(err => {
-      res.json(err);
     });
+    console.log("This api workouts route is working");
   });
 
+  app.post("/api/workout", function (req, res) {
+    db.Workout.create({})
+      .then(dbWorkout => {
+        res.json(dbWorkout);
+      })
+      .catch(err => {
+        res.json(err);
+      });
+  });
+
+  app.put("/api/workouts/:id", (req, res) => {
+    db.Workout
+      .findByIdAndUpdate(req.params.id,
+        { $push: { exercises: req.body } },
+        { new: true, runValidators: true }
+      )
+      .then(dbObject => {
+        console.log(dbObject);
+        res.json(dbObject);
+      })
+      .catch(err => {
+        res.json(err);
+      });
+  });
 };
